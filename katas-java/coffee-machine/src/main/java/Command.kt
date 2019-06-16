@@ -1,18 +1,20 @@
 import kotlin.math.absoluteValue
 
 sealed class Command {
-    class ValidOrder(val drink: DrinkType, val sugar: Int) : Command() {
+    class ValidOrder(val drink: DrinkType, val sugar: Int, val serveExtraHot: Boolean) : Command() {
         fun format(): String {
             val drinkCommand: String = when (drink) {
                 DrinkType.TEA -> "T"
                 DrinkType.COFFEE -> "C"
                 DrinkType.CHOCOLATE -> "H"
+                DrinkType.ORANGE_JUICE -> "O"
                 DrinkType.UNSELECTED -> ""
             }
+            val hotCommand = "h".takeIf { serveExtraHot } ?: ""
             val sugarCommand = sugar.takeIf { it > 0 }?.toString() ?: ""
             val stickCommand = "0".takeIf { sugar > 0 } ?: ""
 
-            return "$drinkCommand:$sugarCommand:$stickCommand"
+            return "$drinkCommand$hotCommand:$sugarCommand:$stickCommand"
         }
     }
 

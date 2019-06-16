@@ -18,8 +18,16 @@ class CoffeeMachine(private val drinkMaker: DrinkMaker) {
         orderState = orderState.copy(drink = DrinkType.CHOCOLATE)
     }
 
+    fun orangeJuice() {
+        orderState = orderState.copy(drink = DrinkType.ORANGE_JUICE)
+    }
+
     fun addSugar() {
         orderState = orderState.copy(sugar = orderState.sugar + 1)
+    }
+
+    fun extraHot() {
+        orderState = orderState.copy(extraHot = true)
     }
 
     fun make() {
@@ -41,11 +49,11 @@ class CoffeeMachine(private val drinkMaker: DrinkMaker) {
             }
 
             if (insertedAmount < drink.price) {
-
                 return Command.MissingMoneyError(insertedAmount - drink.price)
             }
 
-            return Command.ValidOrder(drink, Math.min(sugar, MAX_SUGAR))
+            val serveExtraHot = orderState.extraHot && orderState.drink.canServeHot
+            return Command.ValidOrder(drink, Math.min(sugar, MAX_SUGAR), serveExtraHot)
         }
     }
 
@@ -56,11 +64,7 @@ class CoffeeMachine(private val drinkMaker: DrinkMaker) {
 
 data class OrderState(val drink: DrinkType = DrinkType.UNSELECTED,
                       val sugar: Int = 0,
+                      val extraHot: Boolean = false,
                       val insertedAmount: Double = 0.0)
-
-enum class DrinkType(val price: Double) {
-    COFFEE(0.6), TEA(0.4), CHOCOLATE(0.5), UNSELECTED(0.0)
-
-}
 
 private const val MAX_SUGAR = 2

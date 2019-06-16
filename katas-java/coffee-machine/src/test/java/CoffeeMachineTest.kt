@@ -61,6 +61,35 @@ class CoffeeMachineTest {
     }
 
     @Test
+    fun `should send juice command when orange juice button pressed and has enough money`() {
+        machine.insertCoin(1.0)
+        machine.orangeJuice()
+        machine.make()
+
+        verify(drinkMaker).execute("O::")
+    }
+
+    @Test
+    fun `should send hot command for hot beverages`() {
+        machine.insertCoin(1.0)
+        machine.coffee()
+        machine.extraHot()
+        machine.make()
+
+        verify(drinkMaker).execute("Ch::")
+    }
+
+    @Test
+    fun `should not send hot command for cold beverages`() {
+        machine.insertCoin(1.0)
+        machine.orangeJuice()
+        machine.extraHot()
+        machine.make()
+
+        verify(drinkMaker).execute("O::")
+    }
+
+    @Test
     fun `should send 1 sugar with stick when sugar button pressed once`() {
         machine.insertCoin(1.0)
         machine.coffee()
