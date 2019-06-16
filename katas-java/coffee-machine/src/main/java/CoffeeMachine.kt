@@ -1,4 +1,6 @@
-class CoffeeMachine(private val drinkMaker: DrinkMaker) {
+class CoffeeMachine(private val drinkMaker: DrinkMaker,
+                    val commandsRepository: CommandsRepository,
+                    val reportOutput: ReportOutput) {
 
     private var orderState: OrderState = OrderState()
 
@@ -36,10 +38,15 @@ class CoffeeMachine(private val drinkMaker: DrinkMaker) {
             is Command.ValidOrder -> {
                 drinkMaker.execute(command.format())
                 resetOrder()
+                commandsRepository.storeOrderCommand(command)
             }
             is Command.MissingMoneyError -> drinkMaker.execute(command.format())
         }
 
+    }
+
+    fun printReport() {
+        reportOutput.print(commandsRepository.buildReport())
     }
 
     private fun buildCommand(order: OrderState): Command {

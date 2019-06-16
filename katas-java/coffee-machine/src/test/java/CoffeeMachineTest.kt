@@ -1,7 +1,4 @@
-import com.nhaarman.mockitokotlin2.argumentCaptor
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.times
-import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers
 import org.hamcrest.Matchers.containsString
@@ -13,11 +10,13 @@ class CoffeeMachineTest {
 
     private lateinit var drinkMaker: DrinkMaker
     private lateinit var machine: CoffeeMachine
+    private lateinit var reportOutput: ReportOutput
 
     @Before
     fun setUp() {
         drinkMaker = mock()
-        machine = CoffeeMachine(drinkMaker)
+        reportOutput = mock()
+        machine = CoffeeMachine(drinkMaker, MemoryCommandsRepository(), reportOutput)
     }
 
     @Test
@@ -147,5 +146,36 @@ class CoffeeMachineTest {
         verify(drinkMaker, times(1)).execute(captor.capture())
 
         assertThat(captor.firstValue, Matchers.`is`("C::"))
+    }
+
+    @Test
+    fun `should print report`() {
+        machine.insertCoin(1.0)
+        machine.coffee()
+        machine.make()
+        machine.insertCoin(1.0)
+        machine.coffee()
+        machine.make()
+        machine.insertCoin(1.0)
+        machine.chocolate()
+        machine.make()
+        machine.insertCoin(1.0)
+        machine.chocolate()
+        machine.make()
+        machine.insertCoin(1.0)
+        machine.tea()
+        machine.make()
+
+        machine.printReport()
+
+        val outputCaptor = argumentCaptor<String> {
+            verify(reportOutput).print(capture())
+        }
+        val report = outputCaptor.firstValue
+        assertThat(report, containsString("2 COFFEE"))
+        assertThat(report, containsString("2 CHOCOLATE"))
+        assertThat(report, containsString("1 TEA"))
+        assertThat(report, containsString("2.6"))
+
     }
 }
